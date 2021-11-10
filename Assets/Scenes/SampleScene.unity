@@ -491,7 +491,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654751, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: orthographic
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591584426412654751, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
+      propertyPath: far clip plane
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654751, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: orthographic size
@@ -515,7 +519,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5591584427016993647, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 5591584427016993647, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: m_LocalPosition.y

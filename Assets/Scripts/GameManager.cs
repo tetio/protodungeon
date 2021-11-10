@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
 
     private int width = 8;
     private List<int> length = new List<int> { 8, 192 };
+    private List<int> corridor1 = new List<int>{8, 1, 7};
+    private List<int> corridor2 = new List<int>{7, 1, 8};
+    private List<int> room1 = new List<int>{2, 12, 2};
+    private List<int> room2 = new List<int>{6, 4, 6};
     public List<Vector2> walls = new List<Vector2>();
 
 
@@ -33,9 +37,9 @@ public class GameManager : MonoBehaviour
             }
         }
         // Dungeon
-        int wallLeft = 3;
-        int corridor = 2;
-        int wallRight = 3;
+        int wallLeft = corridor1[0];
+        int corridor = corridor1[1];
+        int wallRight = corridor1[2];
         int low = rng.Next(2) + 1;
         int height = rng.Next(7) + low;
         bool lockedOnRoom = false;
@@ -47,18 +51,18 @@ public class GameManager : MonoBehaviour
             {
                 low = j;
                 height = rng.Next(7) + low + 3;
-                wallLeft = 1;
-                corridor = 6;
-                wallRight = 1;
+                wallLeft = room1[0];
+                corridor = room1[1];
+                wallRight = room1[2];
                 lockedOnRoom = true;
             }
             else if (j > height)
             {
                 lockedOnRoom = false;
                 nextRoomAt = j + rng.Next(4);
-                wallLeft = 3;
-                corridor = 2;
-                wallRight = 3;
+                wallLeft = corridor1[0];
+                corridor = corridor1[1];
+                wallRight = corridor1[2];
             }
             for (int i = 0; i < wallLeft; i++)
             {

@@ -41,14 +41,21 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
             pos.y += p.y - 0.5f;
 
             // Clamp our values
-            float x = Mathf.Clamp(pos.x,-1, 1);
+            float x = Mathf.Clamp(pos.x, -1, 1);
             float y = Mathf.Clamp(pos.y, -1, 1);
-            if (Mathf.Abs(x) > Mathf.Abs(y)) {
-                direction = new Vector3(x, 0, 0).normalized;
+            if (Mathf.Abs(x) > 0.2f || Mathf.Abs(y) > 0.2f)
+            {
+                if (Mathf.Abs(x) > Mathf.Abs(y))
+                {
+                    direction = new Vector3(x, 0, 0).normalized;
+                }
+                else
+                {
+                    direction = new Vector3(0, 0, y).normalized;
+                }
             } else {
-                direction = new Vector3(0, 0, y).normalized;
+                direction = Vector3.zero;
             }
-            
 
             // Also move the visual to reflect the inputs
             joystick.rectTransform.anchoredPosition = new Vector3(direction.x * joystickVisualDistance, direction.z * joystickVisualDistance);
