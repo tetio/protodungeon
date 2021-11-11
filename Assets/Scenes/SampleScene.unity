@@ -336,8 +336,12 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3619815515875322089, guid: 0eb696486911e4dc99237b9725a1ba12, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3619815515875322089, guid: 0eb696486911e4dc99237b9725a1ba12, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -1600
+      value: -1221
       objectReference: {fileID: 0}
     - target: {fileID: 3619815515875322090, guid: 0eb696486911e4dc99237b9725a1ba12, type: 3}
       propertyPath: joystickVisualDistance

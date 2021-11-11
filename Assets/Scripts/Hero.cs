@@ -34,37 +34,40 @@ Rigidbody2D rb;
         {
             return;
         }
-        //float horizontal = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
-        //float vertical = Input.GetAxis("Vertical") * speed * Time.deltaTime;
+
+
+        // float horizontal = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
+        // float vertical = Input.GetAxis("Vertical") * speed * Time.deltaTime;
 
 
         float vertical = inputSource.Direction.z;
         float horizontal = inputSource.Direction.x;
-
-        if (vertical > 0)
+        
+        if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical > 0)
         {
             dstPosition = transform.position + Vector3.up;
             if (CheckForWall(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (vertical < 0)
+        else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < 0)
         {
             dstPosition = transform.position + Vector3.down;
             if (CheckForWall(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (horizontal > 0)
+        else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal > 0)
         {
             dstPosition = transform.position + Vector3.right;
             if (CheckForWall(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (horizontal < 0)
+        else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal < 0)
         {
             dstPosition = transform.position + Vector3.left;
             if (CheckForWall(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
+        
     }
 
     private bool CheckForWall(Vector3 position)
@@ -93,6 +96,6 @@ Rigidbody2D rb;
         }
         transform.position = targetPosition;
         free = true;
-        Input.ResetInputAxes();
+        //Input.ResetInputAxes();
     }
 }

@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject wallTile;
     [SerializeField] private GameObject foodTile;
 
-    private int width = 8;
+    private int width = 16;
     private List<int> length = new List<int> { 8, 192 };
     private List<int> corridor1 = new List<int>{8, 1, 7};
     private List<int> corridor2 = new List<int>{7, 1, 8};
@@ -45,24 +45,25 @@ public class GameManager : MonoBehaviour
         bool lockedOnRoom = false;
         int nextRoomAt = 1 + length[0] + rng.Next(4);
         for (int j = 0 + length[0]; j < length[1]; j++)
-
         {
             if (!lockedOnRoom && nextRoomAt == j)
             {
                 low = j;
                 height = rng.Next(7) + low + 3;
-                wallLeft = room1[0];
-                corridor = room1[1];
-                wallRight = room1[2];
+                List<int> room = (nextRoomAt % 2 == 0)? room1 : room2;
+                wallLeft = room[0];
+                corridor = room[1];
+                wallRight = room[2];
                 lockedOnRoom = true;
             }
             else if (j > height)
             {
                 lockedOnRoom = false;
                 nextRoomAt = j + rng.Next(4);
-                wallLeft = corridor1[0];
-                corridor = corridor1[1];
-                wallRight = corridor1[2];
+                List<int> newCorridor = (height % 2 == 0)? corridor1 : corridor2;
+                wallLeft = newCorridor[0];
+                corridor = newCorridor[1];
+                wallRight = newCorridor[2];
             }
             for (int i = 0; i < wallLeft; i++)
             {
