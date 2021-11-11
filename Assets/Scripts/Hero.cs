@@ -2,14 +2,17 @@ using System;
 using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(AudioSource))]
 public class Hero : MonoBehaviour
 {
+
+    AudioSource footstep;
     int layerMask = ~(1 << 10);
     private float speed = 5f; //0.05f;
 
     public Vector3 dstPosition;
 
-    private float duration = 0.2f;
+    private float duration = 0.5f;
 
     bool free = true;
 
@@ -19,12 +22,13 @@ public class Hero : MonoBehaviour
     // public GameObject _gameManager;
     // GameManager gameManager;
 
-Rigidbody2D rb;
+    Rigidbody2D rb;
     // Start is called before the first frame update
     void Awake()
     {
         // gameManager = _gameManager.GetComponent<GameManager>();//GetComponent<GameManager>();
         rb = GetComponent<Rigidbody2D>();
+        footstep = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -42,38 +46,38 @@ Rigidbody2D rb;
 
         float vertical = inputSource.Direction.z;
         float horizontal = inputSource.Direction.x;
-        
-        if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical > 0)
+
+        if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical > 0.5f)
         {
             dstPosition = transform.position + Vector3.up;
             if (CheckForWall(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < 0)
+        else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < -0.5f)
         {
             dstPosition = transform.position + Vector3.down;
             if (CheckForWall(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal > 0)
+        else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal > 0.5f)
         {
             dstPosition = transform.position + Vector3.right;
             if (CheckForWall(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal < 0)
+        else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal < -0.5f)
         {
             dstPosition = transform.position + Vector3.left;
             if (CheckForWall(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        
+
     }
 
     private bool CheckForWall(Vector3 position)
-     {
-    //    Collider[] colliders = Physics.OverlapSphere(position, 0.0f);
-    //    return colliders.Length == 0; //returns all the colliders that contain your position
+    {
+        //    Collider[] colliders = Physics.OverlapSphere(position, 0.0f);
+        //    return colliders.Length == 0; //returns all the colliders that contain your position
         RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero, 15f, layerMask);
         if (hit.collider != null && hit.collider.tag == "WALL")
         {
@@ -85,6 +89,7 @@ Rigidbody2D rb;
     IEnumerator LerpPosition(Vector3 targetPosition, float duration)
     {
         free = false;
+        footstep.Play();
         float time = 0;
         Vector3 startPosition = transform.position;
 
@@ -96,6 +101,7 @@ Rigidbody2D rb;
         }
         transform.position = targetPosition;
         free = true;
+        footstep.Stop();
         //Input.ResetInputAxes();
     }
 }
