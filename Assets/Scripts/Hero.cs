@@ -6,7 +6,9 @@ using System.Collections;
 public class Hero : MonoBehaviour
 {
 
-    AudioSource footstep;
+    [SerializeField] private AudioClip footstep;
+    [SerializeField] private AudioClip coin;
+    AudioSource sound;
     int layerMask = ~(1 << 10);
     private float speed = 5f; //0.05f;
 
@@ -28,7 +30,8 @@ public class Hero : MonoBehaviour
     {
         // gameManager = _gameManager.GetComponent<GameManager>();//GetComponent<GameManager>();
         rb = GetComponent<Rigidbody2D>();
-        footstep = GetComponent<AudioSource>();
+        sound = GetComponent<AudioSource>();
+        sound.clip = footstep;
     }
 
     // Update is called once per frame
@@ -76,6 +79,7 @@ public class Hero : MonoBehaviour
 
     private bool CheckForWall(Vector3 position)
     {
+        sound.clip = footstep;
         //    Collider[] colliders = Physics.OverlapSphere(position, 0.0f);
         //    return colliders.Length == 0; //returns all the colliders that contain your position
         RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero, 15f, layerMask);
@@ -83,13 +87,18 @@ public class Hero : MonoBehaviour
         {
             return false; // tHere's a wall
         }
+        else if (hit.collider != null && hit.collider.tag == "COIN")
+        {
+            sound.clip = coin;
+            Destroy(hit.collider.transform.gameObject);
+        }
         return true; // no wall!
     }
 
     IEnumerator LerpPosition(Vector3 targetPosition, float duration)
     {
         free = false;
-        footstep.Play();
+        sound.Play();
         float time = 0;
         Vector3 startPosition = transform.position;
 
@@ -101,7 +110,7 @@ public class Hero : MonoBehaviour
         }
         transform.position = targetPosition;
         free = true;
-        footstep.Stop();
+        sound.Stop();
         //Input.ResetInputAxes();
     }
 }

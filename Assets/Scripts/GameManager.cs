@@ -7,16 +7,17 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private GameObject floorTile;
     [SerializeField] private GameObject wallTile;
-    [SerializeField] private GameObject foodTile;
+    [SerializeField] private GameObject coinTile;
 
     private int width = 16;
     private List<int> length = new List<int> { 8, 192 };
-    private List<int> corridor1 = new List<int>{8, 1, 7};
-    private List<int> corridor2 = new List<int>{7, 1, 8};
-    private List<int> room1 = new List<int>{2, 12, 2};
-    private List<int> room2 = new List<int>{6, 4, 6};
+    private List<int> corridor1 = new List<int> { 8, 1, 7 };
+    private List<int> corridor2 = new List<int> { 7, 1, 8 };
+    private List<int> room1 = new List<int> { 2, 12, 2 };
+    private List<int> room2 = new List<int> { 6, 4, 6 };
     public List<Vector2> walls = new List<Vector2>();
 
+    private System.Random rng = new System.Random();
 
 
 
@@ -24,7 +25,6 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        System.Random rng = new System.Random();
         // float tileWidth = floorTile.GetComponents<SpriteRenderer>()[0].sprite.bounds.size.x;
         // float tileHeight = floorTile.GetComponents<SpriteRenderer>()[0].sprite.bounds.size.y;
         // // int tileWidth = floorTile.
@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
             {
                 low = j;
                 height = rng.Next(7) + low + 3;
-                List<int> room = (nextRoomAt % 2 == 0)? room1 : room2;
+                List<int> room = (nextRoomAt % 2 == 0) ? room1 : room2;
                 wallLeft = room[0];
                 corridor = room[1];
                 wallRight = room[2];
@@ -60,33 +60,43 @@ public class GameManager : MonoBehaviour
             {
                 lockedOnRoom = false;
                 nextRoomAt = j + rng.Next(4);
-                List<int> newCorridor = (height % 2 == 0)? corridor1 : corridor2;
+                List<int> newCorridor = (height % 2 == 0) ? corridor1 : corridor2;
                 wallLeft = newCorridor[0];
                 corridor = newCorridor[1];
                 wallRight = newCorridor[2];
             }
-            for (int i = 0; i < wallLeft; i++)
+            BuildRoom(wallLeft, corridor, wallRight, lockedOnRoom, j);
+        }
+    }
+
+    private void BuildRoom(int wallLeft, int corridor, int wallRight, bool lockedOnRoom, int j)
+    {
+        for (int i = 0; i < wallLeft; i++)
+        {
+            var pos = new Vector2(i, j);
+            walls.Add(pos);
+            addChild(Instantiate(wallTile, pos, Quaternion.identity));
+        }
+        for (int i = wallLeft; i < wallLeft + corridor; i++)
+        {
+            addChild(Instantiate(floorTile, new Vector2(i, j), Quaternion.identity));
+            if (lockedOnRoom && rng.Next(100) <= 5)
             {
-                var pos = new Vector2(i, j);
-                walls.Add(pos);
-                addChild(Instantiate(wallTile, pos, Quaternion.identity));
+                addChild(Instantiate(coinTile, new Vector3(i, j, -1), Quaternion.identity));
             }
-            for (int i = wallLeft; i < wallLeft + corridor; i++)
-            {
-                addChild(Instantiate(floorTile, new Vector2(i, j), Quaternion.identity));
-            }
-            for (int i = wallLeft + corridor; i < wallLeft + corridor + wallRight; i++)
-            {
-                var pos = new Vector2(i, j);
-                walls.Add(pos);
-                addChild(Instantiate(wallTile, pos, Quaternion.identity));
-            }
+        }
+        for (int i = wallLeft + corridor; i < wallLeft + corridor + wallRight; i++)
+        {
+            var pos = new Vector2(i, j);
+            walls.Add(pos);
+            addChild(Instantiate(wallTile, pos, Quaternion.identity));
         }
     }
 
     // Update is called once per frame
     void Update()
     {
+
     }
 
     private void addChild(GameObject go)
