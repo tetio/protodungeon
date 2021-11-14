@@ -507,11 +507,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654688, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -300
+      value: -15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591584426412654749, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654751, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: orthographic
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654751, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: far clip plane
@@ -525,6 +529,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hero
       objectReference: {fileID: 0}
+    - target: {fileID: 5591584427016993645, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
+      propertyPath: coin
+      value: 
+      objectReference: {fileID: 8300000, guid: 47e2a781a16d2479b9d9e5df0568d41d, type: 3}
+    - target: {fileID: 5591584427016993645, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
+      propertyPath: footstep
+      value: 
+      objectReference: {fileID: 8300000, guid: ccb6d0885f173454cb58eace7376574d, type: 3}
     - target: {fileID: 5591584427016993645, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: inputSource
       value: 
