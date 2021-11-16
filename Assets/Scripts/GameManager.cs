@@ -1,14 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
 
-    [SerializeField] private GameObject floorTile;
-    [SerializeField] private GameObject wallTile;
-    [SerializeField] private GameObject coinTile;
+    [SerializeField] private GameObject floor;
+    [SerializeField] private GameObject wall;
+    [SerializeField] private GameObject coin;
+    [SerializeField] private GameObject mob;
 
+    [SerializeField] private GameObject hero;
+
+    int layerMask = ~(1 << 10);
     private int width = 16;
     private List<int> length = new List<int> { 8, 192 };
     private List<int> corridor1 = new List<int> { 8, 1, 7 };
@@ -19,8 +24,12 @@ public class GameManager : MonoBehaviour
 
     private System.Random rng = new System.Random();
 
+    private List<GameObject> mobs = new List<GameObject>();
 
-
+    // Mobs' stuff
+    private float nextActionTime = 0.0f;
+    private float mobActionPeriod = 2.0f;
+    private float duration = 0.5f;
 
     // Start is called before the first frame update
     void Awake()
@@ -33,7 +42,7 @@ public class GameManager : MonoBehaviour
         {
             for (int i = 0; i < width; i++)
             {
-                addChild(Instantiate(floorTile, new Vector2(i, j), Quaternion.identity));
+                addChild(Instantiate(floor, new Vector2(i, j), Quaternion.identity));
             }
         }
         // Dungeon
@@ -75,32 +84,85 @@ public class GameManager : MonoBehaviour
         {
             var pos = new Vector2(i, j);
             walls.Add(pos);
-            addChild(Instantiate(wallTile, pos, Quaternion.identity));
+            addChild(Instantiate(wall, pos, Quaternion.identity));
         }
         for (int i = wallLeft; i < wallLeft + corridor; i++)
         {
-            addChild(Instantiate(floorTile, new Vector2(i, j), Quaternion.identity));
-            if (lockedOnRoom && rng.Next(100) <= 5)
+            addChild(Instantiate(floor, new Vector2(i, j), Quaternion.identity));
+            if (lockedOnRoom)
             {
-                addChild(Instantiate(coinTile, new Vector3(i, j, -1), Quaternion.identity));
+                if (rng.Next(100) <= 5)
+                {
+                    addChild(Instantiate(coin, new Vector3(i, j, -1), Quaternion.identity));
+                }
+                else if (rng.Next(100) < 2)
+                {
+                    var mob = Instantiate(this.mob, new Vector3(i, j, -1), Quaternion.identity);
+                    mobs.Add(mob);
+                    addChild(mob);
+
+                }
             }
         }
         for (int i = wallLeft + corridor; i < wallLeft + corridor + wallRight; i++)
         {
             var pos = new Vector2(i, j);
             walls.Add(pos);
-            addChild(Instantiate(wallTile, pos, Quaternion.identity));
+            addChild(Instantiate(wall, pos, Quaternion.identity));
         }
     }
 
     // Update is called once per frame
     void Update()
     {
+        // TODO mob
+        if (Time.time > nextActionTime)
+        {
+            nextActionTime += mobActionPeriod;
+            var activeMobs = mobs.Where(mob => distanceFromHero(mob.transform.position) <= 5);
+            var dir = (rng.Next(10) % 2 == 0) ? Vector3.left : Vector3.right;
+            activeMobs.ToList().ForEach(mob =>
+            {
+                var newPosition = mob.transform.position + dir;
+                if (CanMove(newPosition))
+                    StartCoroutine(LerpPosition(mob, newPosition, duration));
+            });
+        }
 
+    }
+
+    private float distanceFromHero(Vector2 mobPosition)
+    {
+        return Vector2.Distance(mobPosition, hero.transform.position);
     }
 
     private void addChild(GameObject go)
     {
         go.transform.parent = transform;
+    }
+
+
+    private bool CanMove(Vector3 position)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(position, Vector3.zero, 15f, layerMask);
+        if (hit.collider != null && hit.collider.tag == "WALL")
+        {
+            return false; // tHere's a wall
+        }
+        return true; // no wall!
+    }
+
+    IEnumerator LerpPosition(GameObject go, Vector3 targetPosition, float duration)
+    {
+        float time = 0;
+        Vector3 startPosition = go.transform.position;
+
+        while (time < duration)
+        {
+            go.transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        go.transform.position = targetPosition;
     }
 }

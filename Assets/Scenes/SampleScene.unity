@@ -378,9 +378,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fb4fb8a550d749548eb3da631f58dd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floorTile: {fileID: 3493937054207619548, guid: 277327acfa7c74f37b27de947d14fe13, type: 3}
-  wallTile: {fileID: 1159317326130343184, guid: c4e4d3dc06f734836a4ecd0ca8ac7c36, type: 3}
-  coinTile: {fileID: 5455104865137541855, guid: 06801aaf2846f4649a09da32fc907421, type: 3}
+  floor: {fileID: 3493937054207619548, guid: 277327acfa7c74f37b27de947d14fe13, type: 3}
+  wall: {fileID: 1159317326130343184, guid: c4e4d3dc06f734836a4ecd0ca8ac7c36, type: 3}
+  coin: {fileID: 5455104865137541855, guid: 06801aaf2846f4649a09da32fc907421, type: 3}
+  mob: {fileID: 354928832845654518, guid: 2218e3cad97184e52bd0d367b183a935, type: 3}
+  hero: {fileID: 2052013765}
   walls: []
 --- !u!4 &1689470491
 Transform:
@@ -478,6 +480,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2052013765 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5591584427016993644, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
+  m_PrefabInstance: {fileID: 5591584426566580448}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5591584426566580448
 PrefabInstance:
   m_ObjectHideFlags: 0

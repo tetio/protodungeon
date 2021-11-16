@@ -53,31 +53,31 @@ public class Hero : MonoBehaviour
         if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical > 0.5f)
         {
             dstPosition = transform.position + Vector3.up;
-            if (CheckForWall(dstPosition))
+            if (CheckForCollision(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < -0.5f)
         {
             dstPosition = transform.position + Vector3.down;
-            if (CheckForWall(dstPosition))
+            if (CheckForCollision(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal > 0.5f)
         {
             dstPosition = transform.position + Vector3.right;
-            if (CheckForWall(dstPosition))
+            if (CheckForCollision(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal < -0.5f)
         {
             dstPosition = transform.position + Vector3.left;
-            if (CheckForWall(dstPosition))
+            if (CheckForCollision(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
 
     }
 
-    private bool CheckForWall(Vector3 position)
+    private bool CheckForCollision(Vector3 position)
     {
         sound.clip = footstep;
         //    Collider[] colliders = Physics.OverlapSphere(position, 0.0f);
