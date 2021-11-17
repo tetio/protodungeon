@@ -145,9 +145,13 @@ public class GameManager : MonoBehaviour
     private bool CanMove(Vector3 position)
     {
         RaycastHit2D hit = Physics2D.Raycast(position, Vector3.zero, 15f, layerMask);
-        if (hit.collider != null && hit.collider.tag == "WALL")
+        if (hit.collider != null && (hit.collider.tag == "WALL" || hit.collider.tag == "COIN"))
         {
             return false; // tHere's a wall
+        } else if (hit.collider != null && hit.collider.tag == "HERO")
+        {
+            // TODO hero was attacked
+            return false;
         }
         return true; // no wall!
     }

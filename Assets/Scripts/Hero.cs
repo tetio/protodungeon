@@ -14,7 +14,7 @@ public class Hero : MonoBehaviour
 
     public Vector3 dstPosition;
 
-    private float duration = 0.5f;
+    private float duration = 0.3f;
 
     bool free = true;
 
@@ -62,13 +62,13 @@ public class Hero : MonoBehaviour
             if (CheckForCollision(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal > 0.5f)
+        else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal > 0.5f)
         {
             dstPosition = transform.position + Vector3.right;
             if (CheckForCollision(dstPosition))
                 StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (Math.Abs(vertical) <= Math.Abs(horizontal) && horizontal < -0.5f)
+        else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal < -0.5f)
         {
             dstPosition = transform.position + Vector3.left;
             if (CheckForCollision(dstPosition))

@@ -43,7 +43,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
             // Clamp our values
             float x = Mathf.Clamp(pos.x, -1, 1);
             float y = Mathf.Clamp(pos.y, -1, 1);
-            if (Mathf.Abs(x) > 0.2f || Mathf.Abs(y) > 0.2f)
+            if (Mathf.Abs(x) > 0.8f || Mathf.Abs(y) > 0.8f)
             {
                 if (Mathf.Abs(x) > Mathf.Abs(y))
                 {
