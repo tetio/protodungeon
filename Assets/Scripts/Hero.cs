@@ -61,25 +61,25 @@ public class Hero : MonoBehaviour
         {
             dstPosition = transform.position + Vector3.up;
             if (CanMove(hero, dstPosition))
-                StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
+                StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < -0.5f)
         {
             dstPosition = transform.position + Vector3.down;
             if (CanMove(hero, dstPosition))
-                StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
+                StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal > 0.5f)
         {
             dstPosition = transform.position + Vector3.right;
             if (CanMove(hero, dstPosition))
-                StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
+                StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal < -0.5f)
         {
             dstPosition = transform.position + Vector3.left;
             if (CanMove(hero, dstPosition))
-                StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
+                StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
         if (vertical != 0 || horizontal != 0)
         {
@@ -102,7 +102,11 @@ public class Hero : MonoBehaviour
 
     private bool CanMove(GameObject go, Vector3 position)
     {
-        sound.clip = footstep;
+        if (go.tag == "HERO")
+        {
+            sound.clip = footstep;
+        }
+
         //    Collider[] colliders = Physics.OverlapSphere(position, 0.0f);
         //    return colliders.Length == 0; //returns all the colliders that contain your position
         RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero, 15f, layerMask);
@@ -126,28 +130,32 @@ public class Hero : MonoBehaviour
     }
 
 
-    IEnumerator LerpPosition(Vector3 targetPosition, float duration)
-    {
-        free = false;
-        sound.Play();
-        float time = 0;
-        Vector3 startPosition = transform.position;
+    // IEnumerator LerpPosition(Vector3 targetPosition, float duration)
+    // {
+    //     free = false;
+    //     sound.Play();
+    //     float time = 0;
+    //     Vector3 startPosition = transform.position;
 
-        while (time < duration)
-        {
-            transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
-            time += Time.deltaTime;
-            yield return null;
-        }
-        transform.position = targetPosition;
-        free = true;
-        sound.Stop();
-        //Input.ResetInputAxes();
-    }
+    //     while (time < duration)
+    //     {
+    //         transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
+    //         time += Time.deltaTime;
+    //         yield return null;
+    //     }
+    //     transform.position = targetPosition;
+    //     free = true;
+    //     sound.Stop();
+    //     //Input.ResetInputAxes();
+    // }
 
     IEnumerator LerpPosition(GameObject go, Vector3 targetPosition, float duration)
     {
         free = false;
+        if (go.tag == "HERO")
+        {
+            sound.Play();
+        }
         float time = 0;
         Vector3 startPosition = go.transform.position;
 
@@ -159,6 +167,10 @@ public class Hero : MonoBehaviour
         }
         go.transform.position = targetPosition;
         free = true;
+        if (go.tag == "HERO")
+        {
+            sound.Stop();
+        }
         //Input.ResetInputAxes();
     }
 
