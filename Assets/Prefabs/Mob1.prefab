@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 354928832845654516}
   - component: {fileID: 354928832845654517}
+  - component: {fileID: 5703788334455245348}
   m_Layer: 0
   m_Name: Mob1
   m_TagString: Untagged
@@ -82,3 +83,16 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5703788334455245348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 354928832845654518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 453ac4a906fd642df9716f4c063e7187, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hitPoints: 12

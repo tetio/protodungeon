@@ -7,6 +7,11 @@ using UnityEngine.UI;
 [RequireComponent(typeof(AudioSource))]
 public class Hero : MonoBehaviour
 {
+    [SerializeField] private int hitPoints;
+    [SerializeField] private int armorClass;
+
+    [SerializeField] private int damage;
+    [SerializeField] private int thac0;
 
     [SerializeField] private AudioClip footstep;
     [SerializeField] private AudioClip coin;
