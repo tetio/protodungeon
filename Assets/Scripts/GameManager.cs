@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -25,11 +24,11 @@ public class GameManager : MonoBehaviour
     private System.Random rng = new System.Random();
 
     private List<GameObject> mobs = new List<GameObject>();
+    public List<GameObject> Mobs
+    {
+        get {return mobs;}
+    }
 
-    // Mobs' stuff
-    private float nextActionTime = 0.0f;
-    private float mobActionPeriod = 2.0f;
-    private float duration = 0.5f;
 
     // Start is called before the first frame update
     void Awake()
@@ -112,61 +111,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     // Update is called once per frame
     void Update()
     {
-        // TODO mob
-        if (Time.time > nextActionTime)
-        {
-            nextActionTime += mobActionPeriod;
-            var activeMobs = mobs.Where(mob => distanceFromHero(mob.transform.position) <= 5);
-            var dir = (rng.Next(10) % 2 == 0) ? Vector3.left : Vector3.right;
-            activeMobs.ToList().ForEach(mob =>
-            {
-                var newPosition = mob.transform.position + dir;
-                if (CanMove(newPosition))
-                    StartCoroutine(LerpPosition(mob, newPosition, duration));
-            });
-        }
-
     }
 
-    private float distanceFromHero(Vector2 mobPosition)
-    {
-        return Vector2.Distance(mobPosition, hero.transform.position);
-    }
 
     private void addChild(GameObject go)
     {
         go.transform.parent = transform;
     }
 
-
-    private bool CanMove(Vector3 position)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(position, Vector3.zero, 15f, layerMask);
-        if (hit.collider != null && (hit.collider.tag == "WALL" || hit.collider.tag == "COIN"))
-        {
-            return false; // tHere's a wall
-        } else if (hit.collider != null && hit.collider.tag == "HERO")
-        {
-            // TODO hero was attacked
-            return false;
-        }
-        return true; // no wall!
-    }
-
-    IEnumerator LerpPosition(GameObject go, Vector3 targetPosition, float duration)
-    {
-        float time = 0;
-        Vector3 startPosition = go.transform.position;
-
-        while (time < duration)
-        {
-            go.transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
-            time += Time.deltaTime;
-            yield return null;
-        }
-        go.transform.position = targetPosition;
-    }
 }

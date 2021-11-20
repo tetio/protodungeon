@@ -514,7 +514,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654688, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -15
+      value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654749, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: m_Enabled
@@ -522,7 +522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654751, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: orthographic
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654751, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: far clip plane
@@ -530,11 +530,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5591584426412654751, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: orthographic size
-      value: 5
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5591584427016993644, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: m_Name
       value: Hero
+      objectReference: {fileID: 0}
+    - target: {fileID: 5591584427016993644, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
+      propertyPath: m_TagString
+      value: HERO
       objectReference: {fileID: 0}
     - target: {fileID: 5591584427016993645, guid: fea2799c757f049029eb8d8a1af26f12, type: 3}
       propertyPath: coin
