@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections;
 using System.Linq;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(AudioSource))]
 public class Hero : MonoBehaviour
@@ -22,7 +23,9 @@ public class Hero : MonoBehaviour
     private GameManager gameManager;
     private System.Random rng = new System.Random();
 
-    [SerializeField] private VirtualJoystick inputSource;
+    //[SerializeField] private VirtualJoystick inputSource;
+    [SerializeField] private Canvas inputSource;
+
 
     // public GameObject _gameManager;
     // GameManager gameManager;
@@ -58,25 +61,25 @@ public class Hero : MonoBehaviour
         {
             dstPosition = transform.position + Vector3.up;
             if (CanMove(hero, dstPosition))
-                StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
+                StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < -0.5f)
         {
             dstPosition = transform.position + Vector3.down;
             if (CanMove(hero, dstPosition))
-                StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
+                StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal > 0.5f)
         {
             dstPosition = transform.position + Vector3.right;
             if (CanMove(hero, dstPosition))
-                StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
+                StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal < -0.5f)
         {
             dstPosition = transform.position + Vector3.left;
             if (CanMove(hero, dstPosition))
-                StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
+                StartCoroutine(LerpPosition(dstPosition, duration)); //will do the lerp over two seconds
         }
         if (vertical != 0 || horizontal != 0)
         {
@@ -122,10 +125,29 @@ public class Hero : MonoBehaviour
         return true; // no wall!
     }
 
-    IEnumerator LerpPosition(GameObject go, Vector3 targetPosition, float duration)
+
+    IEnumerator LerpPosition(Vector3 targetPosition, float duration)
     {
         free = false;
         sound.Play();
+        float time = 0;
+        Vector3 startPosition = transform.position;
+
+        while (time < duration)
+        {
+            transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPosition;
+        free = true;
+        sound.Stop();
+        //Input.ResetInputAxes();
+    }
+
+    IEnumerator LerpPosition(GameObject go, Vector3 targetPosition, float duration)
+    {
+        free = false;
         float time = 0;
         Vector3 startPosition = go.transform.position;
 
@@ -137,7 +159,6 @@ public class Hero : MonoBehaviour
         }
         go.transform.position = targetPosition;
         free = true;
-        sound.Stop();
         //Input.ResetInputAxes();
     }
 
