@@ -7,6 +7,9 @@ using UnityEngine.UI;
 [RequireComponent(typeof(AudioSource))]
 public class Hero : MonoBehaviour
 {
+
+    private TMPro.TextMeshProUGUI bubbleText;
+
     [SerializeField] private int hitPoints;
     [SerializeField] private int armorClass;
 
@@ -43,6 +46,8 @@ public class Hero : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         sound = GetComponent<AudioSource>();
         sound.clip = footstep;
+        bubbleText = GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        Debug.Log("AAA");
     }
 
     // Update is called once per frame
@@ -95,7 +100,7 @@ public class Hero : MonoBehaviour
 
     void MoveMobs()
     {
-        var activeMobs = gameManager.Mobs.Where(mob => distanceFromHero(mob.transform.position) <= 5);
+        var activeMobs = gameManager.Mobs.Where(mob => distanceFromHero(mob.transform.position) <= 5 && distanceFromHero(mob.transform.position) > 1);
         var dir = (rng.Next(10) % 2 == 0) ? Vector3.left : Vector3.right;
         activeMobs.ToList().ForEach(mob =>
         {
@@ -109,6 +114,7 @@ public class Hero : MonoBehaviour
     {
         if (go.tag == "HERO")
         {
+            bubbleText.text = "";
             sound.clip = footstep;
         }
 
@@ -130,6 +136,17 @@ public class Hero : MonoBehaviour
             {
                 return false;
             }
+        } 
+        else if (hit.collider != null && hit.collider.tag == "MOB" && go.tag == "HERO") 
+        {
+            Debug.Log("HIT");
+            bubbleText.text = "Hit";
+            // needs fixing bubbleText.transform.position = this.transform.position;
+            return false;
+        }
+        else if (hit.collider != null && hit.collider.tag == "HERO") 
+        {
+            return false;
         }
         return true; // no wall!
     }
