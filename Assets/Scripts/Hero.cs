@@ -139,6 +139,7 @@ public class Hero : MonoBehaviour
         {
             if (go.tag == "HERO")
             {
+                bubbleText.text = "I'M RICH!";
                 sound.clip = coin;
                 Destroy(hit.collider.transform.gameObject);
             }
@@ -150,7 +151,8 @@ public class Hero : MonoBehaviour
         else if (hit.collider != null && hit.collider.tag == "MOB" && go.tag == "HERO")
         {
             Debug.Log("HIT");
-            bubbleText.text = "Hit";
+            bubbleText.text = "HIT";
+            StartCoroutine(HitCoroutine(go, duration));
             // needs fixing bubbleText.transform.position = this.transform.position;
             return false;
         }
@@ -206,6 +208,31 @@ public class Hero : MonoBehaviour
         }
         //Input.ResetInputAxes();
     }
+
+
+    IEnumerator HitCoroutine(GameObject go, float duration)
+    {
+        free = false;
+        if (go.tag == "HERO")
+        {
+            //sound.Play();
+        }
+        float time = 0;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            yield return null;
+        }
+        free = true;
+        if (go.tag == "HERO")
+        {
+            // sound.Stop();
+            bubbleText.text = "IDLE";
+        }
+        //Input.ResetInputAxes();
+    }
+
 
     private float distanceFromHero(Vector2 mobPosition)
     {
