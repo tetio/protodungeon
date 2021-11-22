@@ -47,6 +47,7 @@ public class Hero : MonoBehaviour
         sound = GetComponent<AudioSource>();
         sound.clip = footstep;
         bubbleText = GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        bubbleText.text = "IDLE";
         Debug.Log("AAA");
     }
 
@@ -66,44 +67,49 @@ public class Hero : MonoBehaviour
         float vertical = inputSource.Direction.z;
         float horizontal = inputSource.Direction.x;
         GameObject hero = this.transform.gameObject;
+        bool heroIsMoving = (vertical != 0 || horizontal != 0);
 
-        if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical > 0.5f)
+        if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical > 0)
         {
             dstPosition = transform.position + Vector3.up;
             if (CanMove(hero, dstPosition))
                 StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < -0.5f)
+        else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < -0)
         {
             dstPosition = transform.position + Vector3.down;
             if (CanMove(hero, dstPosition))
                 StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal > 0.5f)
+        else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal > 0)
         {
             dstPosition = transform.position + Vector3.right;
             if (CanMove(hero, dstPosition))
                 StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
-        else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal < -0.5f)
+        else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal < -0)
         {
             dstPosition = transform.position + Vector3.left;
             if (CanMove(hero, dstPosition))
                 StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
-        if (vertical != 0 || horizontal != 0)
+
+        if (heroIsMoving)
         {
-            MoveMobs();
+            MobsTurn();
         }
+
+
 
     }
 
-    void MoveMobs()
+    void MobsTurn()
     {
-        var activeMobs = gameManager.Mobs.Where(mob => distanceFromHero(mob.transform.position) <= 5 && distanceFromHero(mob.transform.position) > 1);
+        var activeMobs = gameManager.Mobs.Where(mob => distanceFromHero(mob.transform.position) <= 5);
         var dir = (rng.Next(10) % 2 == 0) ? Vector3.left : Vector3.right;
         activeMobs.ToList().ForEach(mob =>
         {
+            // TODO check if mob can attack (hero is at distance == 1)
             var newPosition = mob.transform.position + dir;
             if (CanMove(mob, newPosition))
                 StartCoroutine(LerpPosition(mob, newPosition, duration));
@@ -114,8 +120,12 @@ public class Hero : MonoBehaviour
     {
         if (go.tag == "HERO")
         {
-            bubbleText.text = "";
+            bubbleText.text = "MOVING";
             sound.clip = footstep;
+        }
+        else if (position == dstPosition)
+        {
+            return false;
         }
 
         //    Collider[] colliders = Physics.OverlapSphere(position, 0.0f);
@@ -136,15 +146,15 @@ public class Hero : MonoBehaviour
             {
                 return false;
             }
-        } 
-        else if (hit.collider != null && hit.collider.tag == "MOB" && go.tag == "HERO") 
+        }
+        else if (hit.collider != null && hit.collider.tag == "MOB" && go.tag == "HERO")
         {
             Debug.Log("HIT");
             bubbleText.text = "Hit";
             // needs fixing bubbleText.transform.position = this.transform.position;
             return false;
         }
-        else if (hit.collider != null && hit.collider.tag == "HERO") 
+        else if (hit.collider != null && hit.collider.tag == "HERO")
         {
             return false;
         }
@@ -192,6 +202,7 @@ public class Hero : MonoBehaviour
         if (go.tag == "HERO")
         {
             sound.Stop();
+            bubbleText.text = "IDLE";
         }
         //Input.ResetInputAxes();
     }
