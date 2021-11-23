@@ -5,22 +5,17 @@ using System.Linq;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(AudioSource))]
-public class Hero : MonoBehaviour
+public class Hero : Entity
 {
 
     private TMPro.TextMeshProUGUI bubbleText;
-
-    [SerializeField] private int hitPoints;
-    [SerializeField] private int armorClass;
-
-    [SerializeField] private int damage;
-    [SerializeField] private int thac0;
 
     [SerializeField] private AudioClip footstep;
     [SerializeField] private AudioClip coin;
     AudioSource sound;
     int layerMask = ~(1 << 10);
-    private float speed = 5f; //0.05f;
+
+    private Combat combat = new Combat();
 
     public Vector3 dstPosition;
 
@@ -151,6 +146,12 @@ public class Hero : MonoBehaviour
         else if (hit.collider != null && hit.collider.tag == "MOB" && go.tag == "HERO")
         {
             Debug.Log("HIT");
+            int damageDone = combat.Attack(this, hit.collider.GetComponent<Entity>());
+            if ( damageDone > 0) 
+            {
+                // check mob HP
+                Debug.Log($"Damage done => {damageDone}");
+            }
             bubbleText.text = "HIT";
             StartCoroutine(HitCoroutine(go, duration));
             // needs fixing bubbleText.transform.position = this.transform.position;

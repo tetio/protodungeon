@@ -182,10 +182,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58dbd40c2c21942de9689811fec0bacb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitPoints: 0
-  armorClass: 0
-  damage: 0
-  thac0: 0
+  hitPoints: 8
+  armorClass: 10
+  damage: 4
+  thac0: 18
   footstep: {fileID: 8300000, guid: ccb6d0885f173454cb58eace7376574d, type: 3}
   coin: {fileID: 8300000, guid: 47e2a781a16d2479b9d9e5df0568d41d, type: 3}
   dstPosition: {x: 0, y: 7, z: 0}
