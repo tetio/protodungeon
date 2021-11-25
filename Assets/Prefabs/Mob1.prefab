@@ -98,7 +98,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitPoints: 4
   armorClass: 10
-  damage: 4
+  damage: 1d4
   thac0: 20
 --- !u!61 &2241222706847462877
 BoxCollider2D:

@@ -184,7 +184,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitPoints: 8
   armorClass: 10
-  damage: 4
+  damage: 1d4+1
   thac0: 18
   footstep: {fileID: 8300000, guid: ccb6d0885f173454cb58eace7376574d, type: 3}
   coin: {fileID: 8300000, guid: 47e2a781a16d2479b9d9e5df0568d41d, type: 3}
