@@ -54,11 +54,6 @@ public class Hero : Entity
             return;
         }
 
-
-        // float horizontal = Input.GetAxis("Horizontal") * speed * Time.deltaTime;
-        // float vertical = Input.GetAxis("Vertical") * speed * Time.deltaTime;
-
-
         float vertical = inputSource.Direction.z;
         float horizontal = inputSource.Direction.x;
         GameObject hero = this.transform.gameObject;
@@ -93,8 +88,10 @@ public class Hero : Entity
         {
             MobsTurn();
         }
+        
+        // Debug.Log(bubbleText.transform.position + " " + this.transform.position);
 
-
+        bubbleText.transform.position = this.transform.position + Vector3.up/16;
 
     }
 
@@ -231,7 +228,6 @@ public class Hero : Entity
             // sound.Stop();
             bubbleText.text = "IDLE";
         }
-        //Input.ResetInputAxes();
     }
 
 
