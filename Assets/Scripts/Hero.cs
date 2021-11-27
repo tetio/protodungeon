@@ -53,7 +53,6 @@ public class Hero : Entity
         {
             return;
         }
-
         float vertical = inputSource.Direction.z;
         float horizontal = inputSource.Direction.x;
         GameObject hero = this.transform.gameObject;
@@ -83,16 +82,11 @@ public class Hero : Entity
             if (CanMove(hero, dstPosition))
                 StartCoroutine(LerpPosition(hero, dstPosition, duration)); //will do the lerp over two seconds
         }
-
         if (heroIsMoving)
         {
             MobsTurn();
         }
-        
-        // Debug.Log(bubbleText.transform.position + " " + this.transform.position);
-
-        bubbleText.transform.position = this.transform.position + Vector3.up/16;
-
+        bubbleText.transform.position = this.transform.position + Vector3.up * 0.8f;
     }
 
     void MobsTurn()
@@ -144,10 +138,14 @@ public class Hero : Entity
         {
             Debug.Log("HIT");
             int damageDone = combat.Attack(this, hit.collider.GetComponent<Entity>());
-            if ( damageDone > 0) 
+            if (damageDone > 0)
             {
                 // check mob HP
                 Debug.Log($"Damage done => {damageDone}");
+            }
+            else
+            {
+                Debug.Log($"Damage done => Miss!");
             }
             bubbleText.text = "HIT";
             StartCoroutine(HitCoroutine(go, duration));
