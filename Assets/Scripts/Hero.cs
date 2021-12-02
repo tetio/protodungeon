@@ -106,6 +106,7 @@ public class Hero : Entity
     {
         if (go.tag == "HERO")
         {
+            bubbleText.color = new Color(255, 255, 255, 255);
             bubbleText.text = "MOVING";
             sound.clip = footstep;
         }
@@ -125,6 +126,7 @@ public class Hero : Entity
         {
             if (go.tag == "HERO")
             {
+                bubbleText.color = new Color(0, 255, 255, 255);
                 bubbleText.text = "I'M RICH!";
                 sound.clip = coin;
                 Destroy(hit.collider.transform.gameObject);
@@ -141,19 +143,29 @@ public class Hero : Entity
             if (damageDone > 0)
             {
                 // check mob HP
+                Mob mob = hit.collider.GetComponent<Mob>();
+                mob.HitPoints -= damageDone;
+                if (mob.HitPoints < 0) {
+                    gameManager.Mobs.Remove(hit.collider.transform.gameObject);
+                    Destroy(hit.collider.transform.gameObject);
+                }
                 Debug.Log($"Damage done => {damageDone}");
+                bubbleText.color = new Color(255, 255, 255, 255);
+                bubbleText.text = $"{damageDone}";
             }
             else
             {
+                bubbleText.text = "MISS!";
                 Debug.Log($"Damage done => Miss!");
             }
-            bubbleText.text = "HIT";
             StartCoroutine(HitCoroutine(go, duration));
             // needs fixing bubbleText.transform.position = this.transform.position;
             return false;
         }
         else if (hit.collider != null && hit.collider.tag == "HERO")
         {
+            bubbleText.color = new Color(255, 0, 0, 255);
+            bubbleText.text = "ARGH!";
             return false;
         }
         return true; // no wall!
@@ -200,6 +212,7 @@ public class Hero : Entity
         if (go.tag == "HERO")
         {
             sound.Stop();
+            bubbleText.color = new Color(255, 255, 255, 255);
             bubbleText.text = "IDLE";
         }
         //Input.ResetInputAxes();
