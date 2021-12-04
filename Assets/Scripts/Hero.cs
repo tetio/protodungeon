@@ -9,6 +9,7 @@ public class Hero : Entity
 {
 
     private TMPro.TextMeshProUGUI bubbleText;
+    private TMPro.TextMeshProUGUI scoreText;
 
     [SerializeField] private AudioClip footstep;
     [SerializeField] private AudioClip coin;
@@ -24,6 +25,9 @@ public class Hero : Entity
     bool free = true;
 
     private GameManager gameManager;
+
+    private int score = 0;
+
     private System.Random rng = new System.Random();
 
     //[SerializeField] private VirtualJoystick inputSource;
@@ -41,7 +45,8 @@ public class Hero : Entity
         rb = GetComponent<Rigidbody2D>();
         sound = GetComponent<AudioSource>();
         sound.clip = footstep;
-        bubbleText = GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        bubbleText = GetComponentsInChildren<TMPro.TextMeshProUGUI>()[0];
+        scoreText = GetComponentsInChildren<TMPro.TextMeshProUGUI>()[1];
         bubbleText.text = "IDLE";
         Debug.Log("AAA");
     }
@@ -129,6 +134,8 @@ public class Hero : Entity
                 bubbleText.color = new Color(0, 255, 255, 255);
                 bubbleText.text = "I'M RICH!";
                 sound.clip = coin;
+                score += 1;
+                scoreText.text = $"Score: {score.ToString().PadLeft(4, '0') }";
                 Destroy(hit.collider.transform.gameObject);
             }
             else
