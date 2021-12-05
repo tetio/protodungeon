@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Canvas : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler
+public class InputSource : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler
 {
 
     private Vector2 iniPoint;

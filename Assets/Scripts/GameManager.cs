@@ -1,126 +1,233 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(AudioSource))]
 public class GameManager : MonoBehaviour
 {
+    private Hero hero;
 
-    [SerializeField] private GameObject floor;
-    [SerializeField] private GameObject wall;
-    [SerializeField] private GameObject coin;
-    [SerializeField] private GameObject mob;
-
-    [SerializeField] private GameObject hero;
+    public Vector3 dstPosition;
+    private float duration = 0.3f;
 
     int layerMask = ~(1 << 10);
-    private int width = 16;
-    private List<int> length = new List<int> { 8, 192 };
-    private List<int> corridor1 = new List<int> { 8, 1, 7 };
-    private List<int> corridor2 = new List<int> { 7, 1, 8 };
-    private List<int> room1 = new List<int> { 2, 12, 2 };
-    private List<int> room2 = new List<int> { 6, 4, 6 };
-    public List<Vector2> walls = new List<Vector2>();
+
+    private int score;
+
+    private Dungeon dungeon;
+
+    private InputSource inputSource;
+
+    AudioSource sound;
 
     private System.Random rng = new System.Random();
 
-    private List<GameObject> mobs = new List<GameObject>();
+    private bool isCoroutineBusy = false;
+
     public List<GameObject> Mobs
     {
-        get {return mobs;}
+        get {return dungeon.Mobs;}
     }
 
+    private Combat combat = new Combat();
 
     // Start is called before the first frame update
     void Awake()
     {
-        // float tileWidth = floorTile.GetComponents<SpriteRenderer>()[0].sprite.bounds.size.x;
-        // float tileHeight = floorTile.GetComponents<SpriteRenderer>()[0].sprite.bounds.size.y;
-        // // int tileWidth = floorTile.
-        // Initial
-        for (int j = 0; j < length[0]; j++)
-        {
-            for (int i = 0; i < width; i++)
-            {
-                addChild(Instantiate(floor, new Vector2(i, j), Quaternion.identity));
-            }
-        }
-        // Dungeon
-        int wallLeft = corridor1[0];
-        int corridor = corridor1[1];
-        int wallRight = corridor1[2];
-        int low = rng.Next(2) + 1;
-        int height = rng.Next(7) + low;
-        bool lockedOnRoom = false;
-        int nextRoomAt = 1 + length[0] + rng.Next(4);
-        for (int j = 0 + length[0]; j < length[1]; j++)
-        {
-            if (!lockedOnRoom && nextRoomAt == j)
-            {
-                low = j;
-                height = rng.Next(7) + low + 3;
-                List<int> room = (nextRoomAt % 2 == 0) ? room1 : room2;
-                wallLeft = room[0];
-                corridor = room[1];
-                wallRight = room[2];
-                lockedOnRoom = true;
-            }
-            else if (j > height)
-            {
-                lockedOnRoom = false;
-                nextRoomAt = j + rng.Next(4);
-                List<int> newCorridor = (height % 2 == 0) ? corridor1 : corridor2;
-                wallLeft = newCorridor[0];
-                corridor = newCorridor[1];
-                wallRight = newCorridor[2];
-            }
-            BuildRoom(wallLeft, corridor, wallRight, lockedOnRoom, j);
-        }
+        dungeon = GameObject.Find("/Dungeon").GetComponent<Dungeon>();
+        hero = GameObject.Find("/Hero").GetComponent<Hero>();
+        inputSource = GameObject.Find("/Canvas/Panel").GetComponent<InputSource>();
+
+        sound = GetComponent<AudioSource>();
+        sound.clip = hero.getAudioClipFootStep();
+
+        combat = new Combat();
+
+        dungeon.generateDungeon(1);
     }
 
-    private void BuildRoom(int wallLeft, int corridor, int wallRight, bool lockedOnRoom, int j)
+void Update()
     {
-        for (int i = 0; i < wallLeft; i++)
+        if (isCoroutineBusy)
         {
-            var pos = new Vector2(i, j);
-            walls.Add(pos);
-            addChild(Instantiate(wall, pos, Quaternion.identity));
+            return;
         }
-        for (int i = wallLeft; i < wallLeft + corridor; i++)
+        float vertical = inputSource.Direction.z;
+        float horizontal = inputSource.Direction.x;
+        GameObject goHero = hero.transform.gameObject;
+        bool heroIsMoving = (vertical != 0 || horizontal != 0);
+
+        if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical > 0)
         {
-            addChild(Instantiate(floor, new Vector2(i, j), Quaternion.identity));
-            if (lockedOnRoom)
+            dstPosition = hero.transform.position + Vector3.up;
+            if (CanMove(goHero, dstPosition))
+                StartCoroutine(LerpPosition(goHero, dstPosition, duration)); //will do the lerp over two seconds
+        }
+        else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < -0)
+        {
+            dstPosition = hero.transform.position + Vector3.down;
+            if (CanMove(goHero, dstPosition))
+                StartCoroutine(LerpPosition(goHero, dstPosition, duration)); //will do the lerp over two seconds
+        }
+        else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal > 0)
+        {
+            dstPosition = hero.transform.position + Vector3.right;
+            if (CanMove(goHero, dstPosition))
+                StartCoroutine(LerpPosition(goHero, dstPosition, duration)); //will do the lerp over two seconds
+        }
+        else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal < -0)
+        {
+            dstPosition = hero.transform.position + Vector3.left;
+            if (CanMove(goHero, dstPosition))
+                StartCoroutine(LerpPosition(goHero, dstPosition, duration)); //will do the lerp over two seconds
+        }
+        if (heroIsMoving)
+        {
+            MobsTurn();
+        }
+        hero.setBubbleTextPosition(hero.transform.position + Vector3.up * 0.8f);
+    }
+
+    void MobsTurn()
+    {
+        var activeMobs = Mobs.Where(mob => distanceFromHero(mob.transform.position) <= 5);
+        var dir = (rng.Next(10) % 2 == 0) ? Vector3.left : Vector3.right;
+        activeMobs.ToList().ForEach(mob =>
+        {
+            // TODO check if mob can attack (hero is at distance == 1)
+            var newPosition = mob.transform.position + dir;
+            if (CanMove(mob, newPosition))
+                StartCoroutine(LerpPosition(mob, newPosition, duration));
+        });
+    }
+
+    private bool CanMove(GameObject go, Vector3 position)
+    {
+        if (go.tag == "HERO")
+        {
+            hero.setBubbleTextColor(new Color(255, 255, 255, 255));
+            hero.setBubbleTextMessage("MOVING");
+            sound.clip = hero.getAudioClipFootStep();
+        }
+        else if (position == dstPosition)
+        {
+            return false;
+        }
+
+        //    Collider[] colliders = Physics.OverlapSphere(position, 0.0f);
+        //    return colliders.Length == 0; //returns all the colliders that contain your position
+        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero, 15f, layerMask);
+        if (hit.collider != null && hit.collider.tag == "WALL")
+        {
+            return false; // tHere's a wall
+        }
+        else if (hit.collider != null && hit.collider.tag == "COIN")
+        {
+            if (go.tag == "HERO")
             {
-                if (rng.Next(100) <= 5)
-                {
-                    addChild(Instantiate(coin, new Vector3(i, j, -1), Quaternion.identity));
+                hero.setBubbleTextColor(new Color(0, 255, 255, 255));
+                hero.setBubbleTextMessage("I'M RICH!");
+                sound.clip = hero.getAudioClipCoin();
+                score += 1;
+                hero.setScoreTextValue(score);
+                Destroy(hit.collider.transform.gameObject);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (hit.collider != null && hit.collider.tag == "MOB" && go.tag == "HERO")
+        {
+            Debug.Log("HIT");
+            int damageDone = combat.Attack(hero, hit.collider.GetComponent<Entity>());
+            if (damageDone > 0)
+            {
+                // check mob HP
+                Mob mob = hit.collider.GetComponent<Mob>();
+                mob.HitPoints -= damageDone;
+                if (mob.HitPoints < 0) {
+                    Mobs.Remove(hit.collider.transform.gameObject);
+                    Destroy(hit.collider.transform.gameObject);
                 }
-                else if (rng.Next(100) < 2)
-                {
-                    var mob = Instantiate(this.mob, new Vector3(i, j, -1), Quaternion.identity);
-                    mobs.Add(mob);
-                    addChild(mob);
-
-                }
+                Debug.Log($"Damage done => {damageDone}");
+                hero.setBubbleTextColor(new Color(255, 255, 255, 255));
+                hero.setBubbleTextMessage($"{damageDone}");
             }
+            else
+            {
+                hero.setBubbleTextMessage("MISS!");
+                Debug.Log($"Damage done => Miss!");
+            }
+            StartCoroutine(HitCoroutine(go, duration));
+            // needs fixing bubbleText.transform.position = this.transform.position;
+            return false;
         }
-        for (int i = wallLeft + corridor; i < wallLeft + corridor + wallRight; i++)
+        else if (hit.collider != null && hit.collider.tag == "HERO")
         {
-            var pos = new Vector2(i, j);
-            walls.Add(pos);
-            addChild(Instantiate(wall, pos, Quaternion.identity));
+            hero.setBubbleTextColor(new Color(255, 0, 0, 255));
+            hero.setBubbleTextMessage("ARGH!");
+            return false;
+        }
+        return true; // no wall!
+    }
+
+    IEnumerator LerpPosition(GameObject go, Vector3 targetPosition, float duration)
+    {
+        isCoroutineBusy = true;
+        if (go.tag == "HERO")
+        {
+            sound.Play();
+        }
+        float time = 0;
+        Vector3 startPosition = go.transform.position;
+
+        while (time < duration)
+        {
+            go.transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        go.transform.position = targetPosition;
+        isCoroutineBusy = false;
+        if (go.tag == "HERO")
+        {
+            sound.Stop();
+            hero.setBubbleTextColor(new Color(255, 255, 255, 255));
+            hero.setBubbleTextMessage("IDLE");
+        }
+        //Input.ResetInputAxes();
+    }
+
+
+    IEnumerator HitCoroutine(GameObject go, float duration)
+    {
+        isCoroutineBusy = true;
+        if (go.tag == "HERO")
+        {
+            //sound.Play();
+        }
+        float time = 0;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            yield return null;
+        }
+        isCoroutineBusy = false;
+        if (go.tag == "HERO")
+        {
+            // sound.Stop();
+            hero.setBubbleTextMessage("IDLE");
         }
     }
 
 
-    // Update is called once per frame
-    void Update()
+    private float distanceFromHero(Vector2 mobPosition)
     {
+        return Vector2.Distance(mobPosition, hero.transform.position);
     }
-
-
-    private void addChild(GameObject go)
-    {
-        go.transform.parent = transform;
-    }
-
 }
