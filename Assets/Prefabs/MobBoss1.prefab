@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5703788334455245348}
   - component: {fileID: 2241222706847462877}
   m_Layer: 0
-  m_Name: Mob1
+  m_Name: MobBoss1
   m_TagString: MOB
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: be40b1472ef664410ae331cb0c7b2dd5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 72bfb5567bf2e4b4ea15649071428e62, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

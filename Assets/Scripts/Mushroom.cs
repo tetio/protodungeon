@@ -2,23 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mob : Entity
+public class Mushroom : MonoBehaviour
 {
 
-    [SerializeField] private int expPoints;
-    public int ExpPoints {
-        get {return expPoints;}
+    [SerializeField] string healingPoints;
+    public int HealingPoints {
+        get {return Dice.Roll(healingPoints);}
     }
-
     // Start is called before the first frame update
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 }

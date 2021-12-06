@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +7,12 @@ public class Dungeon : MonoBehaviour
     [SerializeField] private GameObject wall;
     [SerializeField] private GameObject coin;
     [SerializeField] private GameObject mob;
+    [SerializeField] private GameObject mushroom;
+
+    [SerializeField] private int mobPerLevel = 10;
+    [SerializeField] private int mushroomsPerLevel = 20;
+    [SerializeField] private int coinsPerLevel = 20;
+
     private int width = 16;
     private List<int> length = new List<int> { 8, 192 };
     private List<int> corridor1 = new List<int> { 8, 1, 7 };
@@ -15,6 +20,7 @@ public class Dungeon : MonoBehaviour
     private List<int> room1 = new List<int> { 2, 12, 2 };
     private List<int> room2 = new List<int> { 6, 4, 6 };
     private List<Vector2> walls = new List<Vector2>();
+    private List<Vector2> valid4Spawning = new List<Vector2>();
     public List<Vector2> Walls
     {
         get { return walls; }
@@ -24,7 +30,7 @@ public class Dungeon : MonoBehaviour
     {
         get { return mobs; }
     }
-    private System.Random rng = new System.Random();
+    //private System.Random rng = new System.Random();
 
     public List<Vector2> generateDungeon(int level)
     {
@@ -43,16 +49,16 @@ public class Dungeon : MonoBehaviour
         int wallLeft = corridor1[0];
         int corridor = corridor1[1];
         int wallRight = corridor1[2];
-        int low = rng.Next(2) + 1;
-        int height = rng.Next(7) + low;
+        int low = Random.Range(0, 2) + 1;
+        int height = Random.Range(0, 7) + low;
         bool lockedOnRoom = false;
-        int nextRoomAt = 1 + length[0] + rng.Next(4);
+        int nextRoomAt = 1 + length[0] + Random.Range(0, 4);
         for (int j = 0 + length[0]; j < length[1]; j++)
         {
             if (!lockedOnRoom && nextRoomAt == j)
             {
                 low = j;
-                height = rng.Next(7) + low + 3;
+                height = Random.Range(0, 7) + low + 3;
                 List<int> room = (nextRoomAt % 2 == 0) ? room1 : room2;
                 wallLeft = room[0];
                 corridor = room[1];
@@ -62,7 +68,7 @@ public class Dungeon : MonoBehaviour
             else if (j > height)
             {
                 lockedOnRoom = false;
-                nextRoomAt = j + rng.Next(4);
+                nextRoomAt = j + Random.Range(0, 4);
                 List<int> newCorridor = (height % 2 == 0) ? corridor1 : corridor2;
                 wallLeft = newCorridor[0];
                 corridor = newCorridor[1];
@@ -70,6 +76,9 @@ public class Dungeon : MonoBehaviour
             }
             BuildRoom(wallLeft, corridor, wallRight, lockedOnRoom, j);
         }
+
+        spawnMobsAndItems();
+
         return walls;
     }
 
@@ -86,17 +95,18 @@ public class Dungeon : MonoBehaviour
             addChild(Instantiate(floor, new Vector2(i, j), Quaternion.identity));
             if (lockedOnRoom)
             {
-                if (rng.Next(100) <= 5)
-                {
-                    addChild(Instantiate(coin, new Vector3(i, j, -1), Quaternion.identity));
-                }
-                else if (rng.Next(100) < 2)
-                {
-                    var mob = Instantiate(this.mob, new Vector3(i, j, -1), Quaternion.identity);
-                    mobs.Add(mob);
-                    addChild(mob);
+                // if (Random.Range(0, 100) <= 5)
+                // {
+                //     addChild(Instantiate(coin, new Vector3(i, j, -1), Quaternion.identity));
+                // }
+                // else if (Random.Range(0, 100) < 2)
+                // {
+                //     var mob = Instantiate(this.mob, new Vector3(i, j, -1), Quaternion.identity);
+                //     mobs.Add(mob);
+                //     addChild(mob);
 
-                }
+                // }
+                valid4Spawning.Add(new Vector2(i, j));
             }
         }
         for (int i = wallLeft + corridor; i < wallLeft + corridor + wallRight; i++)
@@ -105,8 +115,40 @@ public class Dungeon : MonoBehaviour
             walls.Add(pos);
             addChild(Instantiate(wall, pos, Quaternion.identity));
         }
+
     }
 
+    private void spawnMobsAndItems()
+    {
+        // Spawn mobs and coins
+        for (int i = 0; i < mobPerLevel; i++)
+        {
+            Vector3 location = getNewSpawnLocation();
+            var mob = Instantiate(this.mob, location, Quaternion.identity);
+            mobs.Add(mob);
+            addChild(mob);
+        }
+        for (int i = 0; i < coinsPerLevel; i++)
+        {
+            Vector3 location = getNewSpawnLocation();
+            var coin = Instantiate(this.coin, location, Quaternion.identity);
+            addChild(coin);
+        }
+        for (int i = 0; i < mushroomsPerLevel; i++)
+        {
+            Vector3 location = getNewSpawnLocation();
+            var mushroom = Instantiate(this.mushroom, location, Quaternion.identity);
+            addChild(mushroom);
+        }
+    }
+
+    private Vector3 getNewSpawnLocation()
+    {
+        int index = Random.Range(0, valid4Spawning.Count);
+        Vector3 loc = new Vector3(valid4Spawning[index].x, valid4Spawning[index].y, -1);
+        valid4Spawning.RemoveAt(index);
+        return loc;
+    }
     private void addChild(GameObject go)
     {
         go.transform.parent = transform;

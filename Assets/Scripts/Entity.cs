@@ -29,4 +29,16 @@ public class Entity : MonoBehaviour
     {
         get { return thac0; }
     }
+
+
+    public int applyDamage(int points) {
+        hitPoints -= points;
+        return hitPoints;
+    }
+
+        public int heal(int points) {
+        hitPoints += points;
+        return hitPoints;
+    }
+
 }

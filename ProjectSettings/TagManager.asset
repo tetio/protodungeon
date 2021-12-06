@@ -9,6 +9,7 @@ TagManager:
   - COIN
   - MOB
   - HERO
+  - MUSHROOM
   layers:
   - Default
   - TransparentFX

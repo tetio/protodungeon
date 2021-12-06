@@ -10,7 +10,6 @@ public class GameManager : MonoBehaviour
 {
     private Hero hero;
 
-    public Vector3 dstPosition;
     private float duration = 0.3f;
 
     int layerMask = ~(1 << 10);
@@ -27,12 +26,11 @@ public class GameManager : MonoBehaviour
 
     private bool isCoroutineBusy = false;
 
+    Vector3 heroDestPosition;
     public List<GameObject> Mobs
     {
         get {return dungeon.Mobs;}
     }
-
-    private Combat combat = new Combat();
 
     // Start is called before the first frame update
     void Awake()
@@ -43,8 +41,6 @@ public class GameManager : MonoBehaviour
 
         sound = GetComponent<AudioSource>();
         sound.clip = hero.getAudioClipFootStep();
-
-        combat = new Combat();
 
         dungeon.generateDungeon(1);
     }
@@ -62,27 +58,27 @@ void Update()
 
         if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical > 0)
         {
-            dstPosition = hero.transform.position + Vector3.up;
-            if (CanMove(goHero, dstPosition))
-                StartCoroutine(LerpPosition(goHero, dstPosition, duration)); //will do the lerp over two seconds
+            heroDestPosition = hero.transform.position + Vector3.up;
+            if (CanMove(goHero, heroDestPosition))
+                StartCoroutine(LerpPosition(goHero, heroDestPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) > Math.Abs(horizontal) && vertical < -0)
         {
-            dstPosition = hero.transform.position + Vector3.down;
-            if (CanMove(goHero, dstPosition))
-                StartCoroutine(LerpPosition(goHero, dstPosition, duration)); //will do the lerp over two seconds
+            heroDestPosition = hero.transform.position + Vector3.down;
+            if (CanMove(goHero, heroDestPosition))
+                StartCoroutine(LerpPosition(goHero, heroDestPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal > 0)
         {
-            dstPosition = hero.transform.position + Vector3.right;
-            if (CanMove(goHero, dstPosition))
-                StartCoroutine(LerpPosition(goHero, dstPosition, duration)); //will do the lerp over two seconds
+            heroDestPosition = hero.transform.position + Vector3.right;
+            if (CanMove(goHero, heroDestPosition))
+                StartCoroutine(LerpPosition(goHero, heroDestPosition, duration)); //will do the lerp over two seconds
         }
         else if (Math.Abs(vertical) < Math.Abs(horizontal) && horizontal < -0)
         {
-            dstPosition = hero.transform.position + Vector3.left;
-            if (CanMove(goHero, dstPosition))
-                StartCoroutine(LerpPosition(goHero, dstPosition, duration)); //will do the lerp over two seconds
+            heroDestPosition = hero.transform.position + Vector3.left;
+            if (CanMove(goHero, heroDestPosition))
+                StartCoroutine(LerpPosition(goHero, heroDestPosition, duration)); //will do the lerp over two seconds
         }
         if (heroIsMoving)
         {
@@ -94,17 +90,18 @@ void Update()
     void MobsTurn()
     {
         var activeMobs = Mobs.Where(mob => distanceFromHero(mob.transform.position) <= 5);
-        var dir = (rng.Next(10) % 2 == 0) ? Vector3.left : Vector3.right;
+        var dir = (rng.Next(10) % 2 == 0) ? 
+         (rng.Next(10) % 2 == 0)? Vector3.left : Vector3.right :
+         (rng.Next(10) % 2 == 0)? Vector3.up : Vector3.down;
         activeMobs.ToList().ForEach(mob =>
         {
-            // TODO check if mob can attack (hero is at distance == 1)
             var newPosition = mob.transform.position + dir;
             if (CanMove(mob, newPosition))
                 StartCoroutine(LerpPosition(mob, newPosition, duration));
         });
     }
 
-    private bool CanMove(GameObject go, Vector3 position)
+    private bool CanMove(GameObject go, Vector3 dstPosition)
     {
         if (go.tag == "HERO")
         {
@@ -112,14 +109,14 @@ void Update()
             hero.setBubbleTextMessage("MOVING");
             sound.clip = hero.getAudioClipFootStep();
         }
-        else if (position == dstPosition)
+        else if (dstPosition == heroDestPosition)
         {
             return false;
         }
 
         //    Collider[] colliders = Physics.OverlapSphere(position, 0.0f);
         //    return colliders.Length == 0; //returns all the colliders that contain your position
-        RaycastHit2D hit = Physics2D.Raycast(position, Vector2.zero, 15f, layerMask);
+        RaycastHit2D hit = Physics2D.Raycast(dstPosition, Vector2.zero, 15f, layerMask);
         if (hit.collider != null && hit.collider.tag == "WALL")
         {
             return false; // tHere's a wall
@@ -140,16 +137,31 @@ void Update()
                 return false;
             }
         }
+        else if (hit.collider != null && hit.collider.tag == "MUSHROOM")
+        {
+            if (go.tag == "HERO")
+            {
+                hero.setBubbleTextColor(new Color(50, 255, 50, 0));
+                hero.setBubbleTextMessage("I FEEL GOOD!");
+                hero.heal(hit.collider.GetComponent<Mushroom>().HealingPoints);
+                sound.clip = hero.getAudioClipYummy();
+                Destroy(hit.collider.transform.gameObject);
+            }
+            else
+            {
+                return false;
+            }
+        }
         else if (hit.collider != null && hit.collider.tag == "MOB" && go.tag == "HERO")
         {
             Debug.Log("HIT");
-            int damageDone = combat.Attack(hero, hit.collider.GetComponent<Entity>());
+            int damageDone = Combat.Attack(hero, hit.collider.GetComponent<Entity>());
             if (damageDone > 0)
             {
                 // check mob HP
                 Mob mob = hit.collider.GetComponent<Mob>();
-                mob.HitPoints -= damageDone;
-                if (mob.HitPoints < 0) {
+                if (mob.applyDamage(damageDone) < 0) {
+                    hero.addExpPoints(mob.ExpPoints);
                     Mobs.Remove(hit.collider.transform.gameObject);
                     Destroy(hit.collider.transform.gameObject);
                 }
@@ -168,8 +180,10 @@ void Update()
         }
         else if (hit.collider != null && hit.collider.tag == "HERO")
         {
+            int damageDone = Combat.Attack(go.GetComponent<Entity>(), hero);
+            hero.applyDamage(damageDone); // TODO check if hero is dead
             hero.setBubbleTextColor(new Color(255, 0, 0, 255));
-            hero.setBubbleTextMessage("ARGH!");
+            hero.setBubbleTextMessage($"{damageDone}");
             return false;
         }
         return true; // no wall!
@@ -221,6 +235,7 @@ void Update()
         if (go.tag == "HERO")
         {
             // sound.Stop();
+            hero.setBubbleTextColor(new Color(255, 255, 255, 255));
             hero.setBubbleTextMessage("IDLE");
         }
     }
