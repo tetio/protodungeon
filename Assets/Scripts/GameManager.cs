@@ -85,6 +85,7 @@ void Update()
             MobsTurn();
         }
         hero.setBubbleTextPosition(hero.transform.position + Vector3.up * 0.8f);
+        hero.setHpTextValue(hero.HitPoints);
     }
 
     void MobsTurn()
@@ -186,6 +187,7 @@ void Update()
             hero.setBubbleTextMessage($"{damageDone}");
             return false;
         }
+        
         return true; // no wall!
     }
 

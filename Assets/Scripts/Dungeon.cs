@@ -76,6 +76,7 @@ public class Dungeon : MonoBehaviour
             }
             BuildRoom(wallLeft, corridor, wallRight, lockedOnRoom, j);
         }
+        // Last room
         List<int> finalRoom = room1;
         wallLeft = finalRoom[0];
         corridor = finalRoom[1];
@@ -85,6 +86,7 @@ public class Dungeon : MonoBehaviour
         {
                 BuildRoom(wallLeft, corridor, wallRight, lockedOnRoom, j);
         }
+        // Last wall, no exit
         BuildRoom(16, 0, 0, false, length[2]);
         spawnMobsAndItems();
 

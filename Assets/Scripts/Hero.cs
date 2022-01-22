@@ -22,6 +22,7 @@ public class Hero : Entity
     private TMPro.TextMeshProUGUI bubbleText;
     private TMPro.TextMeshProUGUI scoreText;
     private TMPro.TextMeshProUGUI experienceText;
+    private TMPro.TextMeshProUGUI hpText;
 
     [SerializeField] private AudioClip footstep;
     [SerializeField] private AudioClip coin;
@@ -36,6 +37,7 @@ public class Hero : Entity
         bubbleText = GetComponentsInChildren<TMPro.TextMeshProUGUI>()[0];
         scoreText = GetComponentsInChildren<TMPro.TextMeshProUGUI>()[1];
         experienceText = GetComponentsInChildren<TMPro.TextMeshProUGUI>()[2];
+        hpText = GetComponentsInChildren<TMPro.TextMeshProUGUI>()[3];
         bubbleText.text = "IDLE";
     }
 
@@ -57,6 +59,11 @@ public class Hero : Entity
     public void setScoreTextValue(int score)
     {
         scoreText.text = $"Score: {score.ToString().PadLeft(4, '0') }";
+    }
+
+    public void setHpTextValue(int hp)
+    {
+        hpText.text = $"Hp: {hp.ToString().PadLeft(3, '0') }";
     }
 
 
