@@ -14,7 +14,7 @@ public class Dungeon : MonoBehaviour
     [SerializeField] private int coinsPerLevel = 20;
 
     private int width = 16;
-    private List<int> length = new List<int> { 8, 192 };
+    private List<int> length = new List<int> { 8, 192, 202 };
     private List<int> corridor1 = new List<int> { 8, 1, 7 };
     private List<int> corridor2 = new List<int> { 7, 1, 8 };
     private List<int> room1 = new List<int> { 2, 12, 2 };
@@ -76,7 +76,16 @@ public class Dungeon : MonoBehaviour
             }
             BuildRoom(wallLeft, corridor, wallRight, lockedOnRoom, j);
         }
-
+        List<int> finalRoom = room1;
+        wallLeft = finalRoom[0];
+        corridor = finalRoom[1];
+        wallRight = finalRoom[2];
+        lockedOnRoom = true;
+        for (int j = 0 + length[1]; j < length[2]; j++)
+        {
+                BuildRoom(wallLeft, corridor, wallRight, lockedOnRoom, j);
+        }
+        BuildRoom(16, 0, 0, false, length[2]);
         spawnMobsAndItems();
 
         return walls;
